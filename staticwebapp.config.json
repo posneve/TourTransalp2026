@@ -1,0 +1,9 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/gpx/*", "/assets/*"]
+  },
+  "mimeTypes": {
+    ".gpx": "application/gpx+xml"
+  }
+}
