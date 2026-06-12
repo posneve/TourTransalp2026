@@ -6,6 +6,8 @@ export interface TrackPoint {
   dist: number;
   /** Cumulative elevation gain from start in metres (based on smoothed elevation) */
   elevGainAcc: number;
+  /** Slope grade in % computed over a ±100 m window of smoothed elevation */
+  grade: number;
 }
 
 export interface TrackStats {
@@ -76,8 +78,29 @@ export async function parseGpx(url: string): Promise<TrackStats> {
     }
     if (p.ele > maxEleM) maxEleM = p.ele;
     if (p.ele < minEleM) minEleM = p.ele;
-    return { ...p, dist: totalDistanceKm, elevGainAcc: elevGainM };
+    return { ...p, dist: totalDistanceKm, elevGainAcc: elevGainM, grade: 0 };
   });
+
+  // Second pass: compute grade at each point using smoothed elevation over a ±100 m window.
+  // Binary-search helpers operating on the already-built points array.
+  const WINDOW_KM = 0.1; // 100 m each side → ~200 m total window
+  const findIdx = (targetDist: number): number => {
+    let lo = 0, hi = points.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (points[mid].dist < targetDist) lo = mid + 1;
+      else hi = mid;
+    }
+    return lo;
+  };
+  for (let i = 0; i < points.length; i++) {
+    const d = points[i].dist;
+    const backIdx = findIdx(Math.max(0, d - WINDOW_KM));
+    const fwdIdx  = findIdx(Math.min(points[points.length - 1].dist, d + WINDOW_KM));
+    const horizM  = (points[fwdIdx].dist - points[backIdx].dist) * 1000;
+    const elevDiff = smoothedEles[fwdIdx] - smoothedEles[backIdx];
+    points[i].grade = horizM > 1 ? (elevDiff / horizM) * 100 : 0;
+  }
 
   return { points, totalDistanceKm, elevGainM, elevLossM, maxEleM, minEleM };
 }

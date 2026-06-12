@@ -13,6 +13,7 @@ interface ChartPoint {
   dist: number;
   ele: number;
   elevGainAcc: number;
+  grade: number;
 }
 
 // Downsample to keep the chart performant (max 500 points)
@@ -40,6 +41,8 @@ function CustomTooltip({ active, payload, totalElevGain, onHoverDist }: CustomTo
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   const pct = totalElevGain > 0 ? ((d.elevGainAcc / totalElevGain) * 100).toFixed(1) : '0.0';
+  const gradeColor = d.grade > 0 ? '#e67e22' : d.grade < 0 ? '#3498db' : '#888';
+  const gradeIcon  = d.grade > 0 ? '⬆' : d.grade < 0 ? '⬇' : '—';
   return (
     <div style={{
       background: '#1e1e2e', border: '1px solid #444', borderRadius: '8px',
@@ -50,6 +53,7 @@ function CustomTooltip({ active, payload, totalElevGain, onHoverDist }: CustomTo
       <div><span style={{ color: '#3498db', fontWeight: 600 }}>{d.ele} m</span> elevation</div>
       <div><span style={{ color: '#2ecc71', fontWeight: 600 }}>↑ {Math.round(d.elevGainAcc).toLocaleString()} m</span> gained</div>
       <div style={{ color: '#aaa' }}>{pct}% of total climb</div>
+      <div style={{ color: gradeColor, fontWeight: 600 }}>{gradeIcon} {Math.abs(d.grade).toFixed(1)}% grade</div>
     </div>
   );
 }
@@ -59,6 +63,7 @@ export default function ElevationProfile({ points, totalElevGain, activeDist, on
     dist: Math.round(p.dist * 10) / 10,
     ele: Math.round(p.ele),
     elevGainAcc: p.elevGainAcc,
+    grade: p.grade,
   }));
 
   return (

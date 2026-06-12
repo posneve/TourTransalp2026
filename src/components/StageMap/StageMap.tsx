@@ -62,6 +62,10 @@ export default function StageMap({ points, minEle, maxEle, hoveredPoint, totalEl
                   {((hoveredPoint.elevGainAcc / totalElevGain) * 100).toFixed(1)}% of total climb
                 </div>
               )}
+              <div style={{ color: hoveredPoint.grade > 0 ? '#e67e22' : hoveredPoint.grade < 0 ? '#3498db' : '#888', fontWeight: 600 }}>
+                {hoveredPoint.grade > 0 ? '⬆' : hoveredPoint.grade < 0 ? '⬇' : '—'}{' '}
+                {Math.abs(hoveredPoint.grade).toFixed(1)}% grade
+              </div>
             </div>
           </Tooltip>
         </CircleMarker>
