@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import StageMap from '../components/StageMap/StageMap';
 import ElevationProfile from '../components/ElevationProfile/ElevationProfile';
 import StageStats from '../components/StageStats/StageStats';
+import StagePlayer from '../components/StagePlayer/StagePlayer';
 import { STAGES } from '../data/stages';
 import { parseGpx } from '../utils/gpxParser';
 import type { TrackPoint, TrackStats } from '../utils/gpxParser';
@@ -29,25 +30,34 @@ export default function StagePage() {
   const [stats, setStats] = useState<TrackStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [hoveredDist, setHoveredDist] = useState<number | null>(null);
+
+  // hoverDist: set by mouse over the chart — takes priority over player
+  const [hoverDist, setHoverDist] = useState<number | null>(null);
+  // playerDist: set by the player animation
+  const [playerDist, setPlayerDist] = useState<number | null>(null);
+
+  // Active dist used for map marker and chart reference line
+  const activeDist = hoverDist ?? playerDist;
 
   useEffect(() => {
     if (!stage) return;
     setLoading(true);
     setStats(null);
     setError(false);
-    setHoveredDist(null);
+    setHoverDist(null);
+    setPlayerDist(null);
     parseGpx(stage.gpxFile)
       .then((s) => { setStats(s); setLoading(false); })
       .catch(() => { setError(true); setLoading(false); });
   }, [stage]);
 
   const hoveredPoint = useMemo(
-    () => (stats && hoveredDist !== null ? findNearestPoint(stats.points, hoveredDist) : null),
-    [stats, hoveredDist]
+    () => (stats && activeDist !== null ? findNearestPoint(stats.points, activeDist) : null),
+    [stats, activeDist]
   );
 
-  const handleHoverDist = useCallback((dist: number | null) => setHoveredDist(dist), []);
+  const handleHoverDist = useCallback((dist: number | null) => setHoverDist(dist), []);
+  const handlePlayerProgress = useCallback((dist: number | null) => setPlayerDist(dist), []);
 
   if (!stage) {
     return <div className={styles.error}>Stage not found. <Link to="/">Back to overview</Link></div>;
@@ -89,9 +99,15 @@ export default function StagePage() {
                 <ElevationProfile
                   points={stats.points}
                   totalElevGain={stats.elevGainM}
+                  activeDist={activeDist}
                   onHoverDist={handleHoverDist}
                 />
               </div>
+              <StagePlayer
+                totalDistanceKm={stats.totalDistanceKm}
+                activeDist={activeDist}
+                onProgress={handlePlayerProgress}
+              />
             </div>
             <div className={styles.statsArea}>
               <h3 className={styles.panelTitle}>Stage Statistics</h3>

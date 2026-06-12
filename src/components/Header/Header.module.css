@@ -44,3 +44,35 @@
   color: #3498db !important;
   background: rgba(52, 152, 219, 0.15) !important;
 }
+
+/* ── Mobile ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .header {
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .brand {
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  .nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-shrink: 1;
+    min-width: 0;
+    gap: 2px;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav a {
+    padding: 5px 7px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+}

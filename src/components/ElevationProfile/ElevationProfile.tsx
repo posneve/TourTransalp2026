@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import type { TrackPoint } from '../../utils/gpxParser';
 
 interface Props {
   points: TrackPoint[];
   totalElevGain: number;
+  activeDist?: number | null;
   onHoverDist?: (dist: number | null) => void;
 }
 
@@ -53,7 +54,7 @@ function CustomTooltip({ active, payload, totalElevGain, onHoverDist }: CustomTo
   );
 }
 
-export default function ElevationProfile({ points, totalElevGain, onHoverDist }: Props) {
+export default function ElevationProfile({ points, totalElevGain, activeDist, onHoverDist }: Props) {
   const data: ChartPoint[] = downsample(points, 500).map((p) => ({
     dist: Math.round(p.dist * 10) / 10,
     ele: Math.round(p.ele),
@@ -100,6 +101,14 @@ export default function ElevationProfile({ points, totalElevGain, onHoverDist }:
             />
           )}
         />
+        {activeDist != null && (
+          <ReferenceLine
+            x={Math.round(activeDist * 10) / 10}
+            stroke="rgba(255,255,255,0.6)"
+            strokeWidth={2}
+            strokeDasharray="4 3"
+          />
+        )}
         <Area
           type="monotone"
           dataKey="ele"

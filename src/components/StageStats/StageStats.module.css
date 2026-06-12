@@ -30,3 +30,14 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+@media (max-width: 768px) {
+  .stat {
+    min-width: calc(50% - 6px);
+    padding: 10px 12px;
+  }
+
+  .statValue {
+    font-size: 1.1rem;
+  }
+}
