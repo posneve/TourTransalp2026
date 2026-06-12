@@ -90,6 +90,7 @@ export default function StagePage() {
               minEle={stats.minEleM}
               maxEle={stats.maxEleM}
               hoveredPoint={hoveredPoint}
+              totalElevGain={stats.elevGainM}
             />
           </div>
           <div className={styles.bottomPanel}>

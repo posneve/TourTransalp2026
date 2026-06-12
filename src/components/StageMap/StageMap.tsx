@@ -1,4 +1,4 @@
-import { Polyline, MapContainer, CircleMarker, useMap } from 'react-leaflet';
+import { Polyline, MapContainer, CircleMarker, Tooltip, useMap } from 'react-leaflet';
 import { useEffect } from 'react';
 import L from 'leaflet';
 import type { TrackPoint } from '../../utils/gpxParser';
@@ -10,6 +10,7 @@ interface Props {
   minEle: number;
   maxEle: number;
   hoveredPoint?: TrackPoint | null;
+  totalElevGain?: number;
 }
 
 function FitBounds({ points }: { points: TrackPoint[] }) {
@@ -23,7 +24,7 @@ function FitBounds({ points }: { points: TrackPoint[] }) {
   return null;
 }
 
-export default function StageMap({ points, minEle, maxEle, hoveredPoint }: Props) {
+export default function StageMap({ points, minEle, maxEle, hoveredPoint, totalElevGain }: Props) {
   const range = maxEle - minEle || 1;
 
   // Build segments: each segment connects two consecutive points and is coloured
@@ -50,7 +51,20 @@ export default function StageMap({ points, minEle, maxEle, hoveredPoint }: Props
           center={[hoveredPoint.lat, hoveredPoint.lon]}
           radius={8}
           pathOptions={{ color: '#fff', fillColor: '#3498db', fillOpacity: 1, weight: 2 }}
-        />
+        >
+          <Tooltip permanent direction="top" offset={[0, -12]} opacity={1}>
+            <div style={{ lineHeight: '1.5', fontSize: '12px', whiteSpace: 'nowrap' }}>
+              <div style={{ color: '#555', marginBottom: 2 }}>📍 {hoveredPoint.dist.toFixed(1)} km</div>
+              <div><strong style={{ color: '#1a6faf' }}>{Math.round(hoveredPoint.ele)} m</strong> elevation</div>
+              <div><strong style={{ color: '#27ae60' }}>↑ {Math.round(hoveredPoint.elevGainAcc).toLocaleString()} m</strong> gained</div>
+              {totalElevGain != null && totalElevGain > 0 && (
+                <div style={{ color: '#777' }}>
+                  {((hoveredPoint.elevGainAcc / totalElevGain) * 100).toFixed(1)}% of total climb
+                </div>
+              )}
+            </div>
+          </Tooltip>
+        </CircleMarker>
       )}
       <FitBounds points={points} />
     </MapContainer>
