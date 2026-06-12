@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';import { useParams, Link } from 'react-router-dom';
 import StageMap from '../components/StageMap/StageMap';
 import ElevationProfile from '../components/ElevationProfile/ElevationProfile';
 import StageStats from '../components/StageStats/StageStats';
@@ -35,6 +34,8 @@ export default function StagePage() {
   const [hoverDist, setHoverDist] = useState<number | null>(null);
   // playerDist: set by the player animation
   const [playerDist, setPlayerDist] = useState<number | null>(null);
+  // mobile collapse state for elevation profile
+  const [profileCollapsed, setProfileCollapsed] = useState(false);
 
   // Active dist used for map marker and chart reference line
   const activeDist = hoverDist ?? playerDist;
@@ -95,20 +96,31 @@ export default function StagePage() {
           </div>
           <div className={styles.bottomPanel}>
             <div className={styles.profileArea}>
-              <h3 className={styles.panelTitle}>Elevation Profile</h3>
-              <div className={styles.chartWrapper}>
-                <ElevationProfile
-                  points={stats.points}
-                  totalElevGain={stats.elevGainM}
+              <div className={styles.profileHeader}>
+                <h3 className={styles.panelTitle}>Elevation Profile</h3>
+                <button
+                  className={styles.collapseBtn}
+                  onClick={() => setProfileCollapsed((c) => !c)}
+                  aria-expanded={!profileCollapsed}
+                >
+                  {profileCollapsed ? '▼ Show' : '▲ Hide'}
+                </button>
+              </div>
+              <div className={`${styles.collapsibleContent}${profileCollapsed ? ` ${styles.collapsed}` : ''}`}>
+                <div className={styles.chartWrapper}>
+                  <ElevationProfile
+                    points={stats.points}
+                    totalElevGain={stats.elevGainM}
+                    activeDist={activeDist}
+                    onHoverDist={handleHoverDist}
+                  />
+                </div>
+                <StagePlayer
+                  totalDistanceKm={stats.totalDistanceKm}
                   activeDist={activeDist}
-                  onHoverDist={handleHoverDist}
+                  onProgress={handlePlayerProgress}
                 />
               </div>
-              <StagePlayer
-                totalDistanceKm={stats.totalDistanceKm}
-                activeDist={activeDist}
-                onProgress={handlePlayerProgress}
-              />
             </div>
             <div className={styles.statsArea}>
               <h3 className={styles.panelTitle}>Stage Statistics</h3>

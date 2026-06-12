@@ -115,6 +115,36 @@
   margin-left: 8px;
 }
 
+/* ── Collapsible profile header (used on mobile) ────── */
+.profileHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 8px;
+}
+
+.collapseBtn {
+  display: none; /* hidden on desktop */
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  color: #aaa;
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  cursor: pointer;
+  line-height: 1.4;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.collapseBtn:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,0.35);
+}
+
+.collapsibleContent {
+  display: contents; /* transparent on desktop — no layout effect */
+}
+
 /* ── Mobile ─────────────────────────────────────────── */
 @media (max-width: 768px) {
   .page {
@@ -142,6 +172,26 @@
     border-right: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     height: auto;
+  }
+
+  .collapseBtn {
+    display: inline-block;
+  }
+
+  .collapsibleContent {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* animate open/close */
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    max-height: 400px;
+    opacity: 1;
+  }
+
+  .collapsibleContent.collapsed {
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
   }
 
   .chartWrapper {
