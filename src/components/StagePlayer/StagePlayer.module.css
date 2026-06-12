@@ -109,11 +109,17 @@
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   background: #fff;
   border: 2px solid #3498db;
   border-radius: 50%;
-  pointer-events: none;
+  cursor: grab;
+  pointer-events: auto;
   transition: left 0.05s linear;
+}
+
+.progressThumb:active {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.2);
 }

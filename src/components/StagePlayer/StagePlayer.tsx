@@ -15,17 +15,22 @@ export default function StagePlayer({ totalDistanceKm, activeDist, onProgress }:
   const [speed, setSpeed] = useState(1);
   const distRef = useRef(0);
   const isDragging = useRef(false);
+  const trackRef = useRef<HTMLDivElement>(null);
 
   // Keep distRef in sync when external activeDist changes (e.g. mouse hover overrides player)
-  // Only sync when NOT playing so the player doesn't fight with hover
+  // Only sync when NOT playing and not dragging so the player doesn't fight with hover
   useEffect(() => {
-    if (!isPlaying && activeDist !== null) distRef.current = activeDist;
+    if (!isPlaying && !isDragging.current && activeDist !== null) distRef.current = activeDist;
   }, [activeDist, isPlaying]);
 
   const stop = useCallback(() => setIsPlaying(false), []);
 
   const play = () => {
-    if (distRef.current >= totalDistanceKm) distRef.current = 0;
+    // If at the end, restart from beginning
+    if (distRef.current >= totalDistanceKm) {
+      distRef.current = 0;
+      onProgress(0);
+    }
     setIsPlaying(true);
   };
 
@@ -51,14 +56,27 @@ export default function StagePlayer({ totalDistanceKm, activeDist, onProgress }:
 
   const pct = totalDistanceKm > 0 ? Math.min(100, ((activeDist ?? 0) / totalDistanceKm) * 100) : 0;
 
-  const seekTo = useCallback((e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
-    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
+  /** Seek to a clientX position relative to the track element. */
+  const seekToClientX = useCallback((clientX: number) => {
+    if (!trackRef.current) return;
+    const rect = trackRef.current.getBoundingClientRect();
     const fraction = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     const newDist = fraction * totalDistanceKm;
     distRef.current = newDist;
     onProgress(newDist);
   }, [totalDistanceKm, onProgress]);
+
+  // Document-level mouse events so dragging outside the track still works
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => { if (isDragging.current) seekToClientX(e.clientX); };
+    const onUp   = () => { isDragging.current = false; };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    return () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+  }, [seekToClientX]);
 
   return (
     <div className={styles.player}>
@@ -88,14 +106,12 @@ export default function StagePlayer({ totalDistanceKm, activeDist, onProgress }:
         </span>
       </div>
       <div
+        ref={trackRef}
         className={styles.progressTrack}
-        onClick={seekTo}
-        onMouseDown={() => { isDragging.current = true; }}
-        onMouseMove={(e) => { if (isDragging.current) seekTo(e); }}
-        onMouseUp={() => { isDragging.current = false; }}
-        onMouseLeave={() => { isDragging.current = false; }}
-        onTouchStart={seekTo}
-        onTouchMove={seekTo}
+        onClick={(e) => seekToClientX(e.clientX)}
+        onMouseDown={(e) => { isDragging.current = true; seekToClientX(e.clientX); }}
+        onTouchStart={(e) => seekToClientX(e.touches[0].clientX)}
+        onTouchMove={(e) => seekToClientX(e.touches[0].clientX)}
         role="slider"
         aria-valuenow={pct}
         aria-valuemin={0}
