@@ -1,5 +1,5 @@
 import { Polyline, MapContainer, CircleMarker, Tooltip, useMap } from 'react-leaflet';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import type { TrackPoint } from '../../utils/gpxParser';
 import { elevationToColor } from '../../utils/elevationColor';
@@ -21,6 +21,37 @@ function FitBounds({ points }: { points: TrackPoint[] }) {
       map.fitBounds(bounds, { padding: [20, 20] });
     }
   }, [points, map]);
+  return null;
+}
+
+/**
+ * Watches hoveredPoint and pans the map if the point leaves the central 70%
+ * of the viewport (15% dead zone on each edge).
+ */
+function AutoPan({ point }: { point: TrackPoint | null | undefined }) {
+  const map = useMap();
+  // Skip the very first render so FitBounds runs first without fighting AutoPan
+  const initialised = useRef(false);
+
+  useEffect(() => {
+    if (!point) { initialised.current = false; return; }
+    if (!initialised.current) { initialised.current = true; return; }
+
+    const size = map.getSize();          // map container size in px
+    const px   = map.latLngToContainerPoint([point.lat, point.lon]);
+
+    const mx = size.x * 0.15;           // 15 % margin → 70 % safe zone
+    const my = size.y * 0.15;
+
+    const inside =
+      px.x >= mx && px.x <= size.x - mx &&
+      px.y >= my && px.y <= size.y - my;
+
+    if (!inside) {
+      map.panTo([point.lat, point.lon], { animate: true, duration: 0.4 });
+    }
+  }, [point, map]);
+
   return null;
 }
 
@@ -71,6 +102,7 @@ export default function StageMap({ points, minEle, maxEle, hoveredPoint, totalEl
         </CircleMarker>
       )}
       <FitBounds points={points} />
+      <AutoPan point={hoveredPoint} />
     </MapContainer>
   );
 }
