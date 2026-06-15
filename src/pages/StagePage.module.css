@@ -184,7 +184,7 @@
     overflow: hidden;
     /* animate open/close */
     transition: max-height 0.3s ease, opacity 0.3s ease;
-    max-height: 400px;
+    max-height: 200px;
     opacity: 1;
   }
 

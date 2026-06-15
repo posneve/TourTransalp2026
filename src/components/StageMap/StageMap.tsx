@@ -40,8 +40,8 @@ function AutoPan({ point }: { point: TrackPoint | null | undefined }) {
     const size = map.getSize();          // map container size in px
     const px   = map.latLngToContainerPoint([point.lat, point.lon]);
 
-    const mx = size.x * 0.15;           // 15 % margin → 70 % safe zone
-    const my = size.y * 0.15;
+    const mx = size.x * 0.225;          // 22.5 % margin → 55 % safe zone
+    const my = size.y * 0.225;
 
     const inside =
       px.x >= mx && px.x <= size.x - mx &&

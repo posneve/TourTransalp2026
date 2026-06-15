@@ -115,12 +115,12 @@ export default function StagePage() {
                     onHoverDist={handleHoverDist}
                   />
                 </div>
-                <StagePlayer
-                  totalDistanceKm={stats.totalDistanceKm}
-                  activeDist={activeDist}
-                  onProgress={handlePlayerProgress}
-                />
               </div>
+              <StagePlayer
+                totalDistanceKm={stats.totalDistanceKm}
+                activeDist={activeDist}
+                onProgress={handlePlayerProgress}
+              />
             </div>
             <div className={styles.statsArea}>
               <h3 className={styles.panelTitle}>Stage Statistics</h3>
