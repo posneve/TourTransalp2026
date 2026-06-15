@@ -115,6 +115,37 @@
   margin-left: 8px;
 }
 
+/* ── 2D / 3D map toggle (lives in the top bar) ──────── */
+.mapToggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mapToggleBtn {
+  padding: 5px 14px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #888;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  transition: color 0.15s, background 0.15s;
+}
+
+.mapToggleBtn:hover {
+  color: #fff;
+}
+
+.mapToggleBtnActive {
+  color: #fff;
+  background: rgba(52, 152, 219, 0.35);
+}
+
 /* ── Collapsible profile header (used on mobile) ────── */
 .profileHeader {
   display: flex;

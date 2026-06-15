@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';import { useParams, Link } from 'react-router-dom';
 import StageMap from '../components/StageMap/StageMap';
+import StageMap3D from '../components/StageMap3D/StageMap3D';
 import ElevationProfile from '../components/ElevationProfile/ElevationProfile';
 import StageStats from '../components/StageStats/StageStats';
 import StagePlayer from '../components/StagePlayer/StagePlayer';
@@ -29,6 +30,7 @@ export default function StagePage() {
   const [stats, setStats] = useState<TrackStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [mapMode, setMapMode] = useState<'2d' | '3d'>('2d');
 
   // hoverDist: set by mouse over the chart — takes priority over player
   const [hoverDist, setHoverDist] = useState<number | null>(null);
@@ -74,6 +76,16 @@ export default function StagePage() {
           <span className={styles.stageLabel}>{stage.name}</span>
           <h1 className={styles.stageName}>{stage.start} → {stage.end}</h1>
         </div>
+        <div className={styles.mapToggle}>
+          <button
+            className={`${styles.mapToggleBtn}${mapMode === '2d' ? ` ${styles.mapToggleBtnActive}` : ''}`}
+            onClick={() => setMapMode('2d')}
+          >2D</button>
+          <button
+            className={`${styles.mapToggleBtn}${mapMode === '3d' ? ` ${styles.mapToggleBtnActive}` : ''}`}
+            onClick={() => setMapMode('3d')}
+          >3D</button>
+        </div>
         <div className={styles.navButtons}>
           {prevStage && <Link to={`/stage/${prevStage.id}`} className={styles.navBtn}>← S{prevStage.id}</Link>}
           {nextStage && <Link to={`/stage/${nextStage.id}`} className={styles.navBtn}>S{nextStage.id} →</Link>}
@@ -86,13 +98,23 @@ export default function StagePage() {
       {stats && (
         <div className={styles.content}>
           <div className={styles.mapArea}>
-            <StageMap
-              points={stats.points}
-              minEle={stats.minEleM}
-              maxEle={stats.maxEleM}
-              hoveredPoint={hoveredPoint}
-              totalElevGain={stats.elevGainM}
-            />
+            {mapMode === '2d' ? (
+              <StageMap
+                points={stats.points}
+                minEle={stats.minEleM}
+                maxEle={stats.maxEleM}
+                hoveredPoint={hoveredPoint}
+                totalElevGain={stats.elevGainM}
+              />
+            ) : (
+              <StageMap3D
+                points={stats.points}
+                minEle={stats.minEleM}
+                maxEle={stats.maxEleM}
+                hoveredPoint={hoveredPoint}
+                totalElevGain={stats.elevGainM}
+              />
+            )}
           </div>
           <div className={styles.bottomPanel}>
             <div className={styles.profileArea}>

@@ -1,0 +1,48 @@
+.wrapper {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.map {
+  height: 100%;
+  width: 100%;
+  border-radius: 8px;
+}
+
+/* ── Satellite / Map layer toggle ── */
+.layerToggle {
+  position: absolute;
+  bottom: 28px; /* above the MapLibre attribution bar */
+  left: 10px;
+  z-index: 1;
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(13, 13, 26, 0.82);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.layerBtn {
+  padding: 5px 13px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #999;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  transition: color 0.15s, background 0.15s;
+}
+
+.layerBtn:hover {
+  color: #fff;
+}
+
+.layerBtnActive {
+  color: #fff;
+  background: rgba(52, 152, 219, 0.35);
+}
